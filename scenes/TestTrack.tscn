@@ -82,7 +82,7 @@ script = ExtResource("2_camrig")
 TargetPath = NodePath("../Scooter")
 
 [node name="SpringArm3D" type="SpringArm3D" parent="CameraRig"]
-rotation_degrees = Vector3(-20, 180, 0)
+rotation_degrees = Vector3(-20, 0, 0)
 spring_length = 6.0
 
 [node name="Camera3D" type="Camera3D" parent="CameraRig/SpringArm3D"]

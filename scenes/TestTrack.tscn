@@ -57,7 +57,7 @@ mesh = SubResource("BoxMesh_ground")
 shape = SubResource("BoxShape3D_ground")
 
 [node name="Ramp" type="StaticBody3D" parent="."]
-position = Vector3(0, 0.7, -14)
+position = Vector3(0, 0.7, -6)
 rotation_degrees = Vector3(-15, 0, 0)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ramp"]

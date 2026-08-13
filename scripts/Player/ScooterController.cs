@@ -4,11 +4,11 @@ namespace ScooterStunt.Player;
 
 public partial class ScooterController : CharacterBody3D
 {
-	[Export] public float Acceleration = 18.0f;
-	[Export] public float MaxSpeed = 14.0f;
+	[Export] public float Acceleration = 16.0f;
+	[Export] public float MaxSpeed = 12.0f;
 	[Export] public float Friction = 10.0f;
 	[Export] public float TurnSpeed = 2.5f;
-	[Export] public float JumpVelocity = 8.0f;
+	[Export] public float JumpVelocity = 10.5f;
 	[Export] public float Gravity = 22.0f;
 
 	private float _speed;

@@ -12,11 +12,13 @@ public partial class TrickController : Node
 	[Export] public float BaseCleanLandingToleranceDegrees = 35.0f;
 	[Export] public int PointsPerFullSpin = 100;
 	[Export] public UpgradeDefinition LandingToleranceUpgrade;
+	[Export] public NodePath LandingParticlesPath;
 
 	private ScooterController _scooter;
 	private Node3D _visualMesh;
 	private ScoreManager _scoreManager;
 	private PlayerProgression _progression;
+	private GpuParticles3D _landingParticles;
 	private float _airSpinDegrees;
 	private float _effectiveToleranceDegrees;
 
@@ -26,6 +28,11 @@ public partial class TrickController : Node
 		_visualMesh = GetNode<Node3D>(VisualMeshPath);
 		_scoreManager = GetNode<ScoreManager>("/root/Score");
 		_progression = GetNode<PlayerProgression>("/root/Progression");
+
+		if (LandingParticlesPath != null && !LandingParticlesPath.IsEmpty)
+		{
+			_landingParticles = GetNode<GpuParticles3D>(LandingParticlesPath);
+		}
 
 		_progression.UpgradePurchased += (_, _) => RecalculateUpgrades();
 		RecalculateUpgrades();
@@ -46,7 +53,7 @@ public partial class TrickController : Node
 			var spinInput = Input.GetAxis("scooter_steer_left", "scooter_steer_right");
 			if (Mathf.Abs(spinInput) > 0.01f)
 			{
-				var spinDelta = spinInput * SpinSpeedDegreesPerSecond * dt;
+				var spinDelta = -spinInput * SpinSpeedDegreesPerSecond * dt;
 				_airSpinDegrees += spinDelta;
 				_visualMesh.RotateY(Mathf.DegToRad(spinDelta));
 			}
@@ -60,6 +67,12 @@ public partial class TrickController : Node
 
 	private void EvaluateLanding()
 	{
+		if (_landingParticles != null)
+		{
+			_landingParticles.Restart();
+			_landingParticles.Emitting = true;
+		}
+
 		var absSpin = Mathf.Abs(_airSpinDegrees);
 		var fullSpins = Mathf.RoundToInt(absSpin / 360.0f);
 		var remainder = absSpin - fullSpins * 360.0f;

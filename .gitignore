@@ -16,3 +16,8 @@ obj/
 # System/editor
 .DS_Store
 Thumbs.db
+
+# Third-party asset pack with unclear license (itch.io, no LICENSE file,
+# creator never answered license questions) - local prototyping only,
+# do not redistribute via this repo.
+assets/skatepark/

@@ -1,0 +1,167 @@
+[gd_scene load_steps=23 format=3]
+
+[ext_resource type="Script" path="res://scripts/Player/ScooterController.cs" id="1_scooter"]
+[ext_resource type="Script" path="res://scripts/Player/CameraRig.cs" id="2_camrig"]
+[ext_resource type="Script" path="res://scripts/Tricks/TrickController.cs" id="3_trick"]
+[ext_resource type="PackedScene" path="res://scenes/UI/Hud.tscn" id="4_hud"]
+[ext_resource type="Script" path="res://scripts/Missions/MissionManager.cs" id="5_missionmgr"]
+[ext_resource type="PackedScene" path="res://scenes/UI/MissionPanel.tscn" id="6_missionpanel"]
+[ext_resource type="Resource" path="res://data/missions/mission_score.tres" id="7_mission_score"]
+[ext_resource type="Resource" path="res://data/missions/mission_tricks.tres" id="8_mission_tricks"]
+[ext_resource type="Resource" path="res://data/missions/mission_combo.tres" id="9_mission_combo"]
+[ext_resource type="Script" path="res://scripts/Missions/MissionDefinition.cs" id="10_missiondef"]
+[ext_resource type="Resource" path="res://data/upgrades/upgrade_jump_height.tres" id="11_upgrade_jump"]
+[ext_resource type="Resource" path="res://data/upgrades/upgrade_max_speed.tres" id="12_upgrade_speed"]
+[ext_resource type="Resource" path="res://data/upgrades/upgrade_landing_tolerance.tres" id="13_upgrade_landing"]
+[ext_resource type="Script" path="res://scripts/Progression/UpgradeDefinition.cs" id="14_upgradedef"]
+[ext_resource type="PackedScene" path="res://scenes/UI/UpgradeShop.tscn" id="15_upgradeshop"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_scooter"]
+radius = 0.4
+height = 1.6
+
+[sub_resource type="StandardMaterial3D" id="Mat_deck"]
+albedo_color = Color(0.85, 0.15, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_deck"]
+material = SubResource("Mat_deck")
+size = Vector3(0.24, 0.08, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="Mat_wheel"]
+albedo_color = Color(0.9, 0.9, 0.92, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_wheel"]
+material = SubResource("Mat_wheel")
+top_radius = 0.15
+bottom_radius = 0.15
+height = 0.07
+
+[sub_resource type="StandardMaterial3D" id="Mat_handlebar"]
+albedo_color = Color(0.55, 0.57, 0.6, 1)
+metallic = 0.6
+
+[sub_resource type="BoxMesh" id="BoxMesh_post"]
+material = SubResource("Mat_handlebar")
+size = Vector3(0.05, 0.9, 0.05)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bar"]
+material = SubResource("Mat_handlebar")
+size = Vector3(0.5, 0.05, 0.05)
+
+[sub_resource type="StandardMaterial3D" id="Mat_rider"]
+albedo_color = Color(0.15, 0.45, 0.85, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_rider"]
+material = SubResource("Mat_rider")
+radius = 0.22
+height = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Mat_head"]
+albedo_color = Color(0.9, 0.75, 0.6, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_head"]
+material = SubResource("Mat_head")
+radius = 0.16
+height = 0.32
+
+[sub_resource type="StandardMaterial3D" id="Mat_dust"]
+albedo_color = Color(0.75, 0.7, 0.6, 0.85)
+transparency = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_dust"]
+material = SubResource("Mat_dust")
+radius = 0.08
+height = 0.16
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleMat_dust"]
+direction = Vector3(0, 1, 0)
+spread = 50.0
+initial_velocity_min = 1.5
+initial_velocity_max = 3.0
+gravity = Vector3(0, -6, 0)
+scale_min = 0.4
+scale_max = 1.0
+
+[node name="PlayerRig" type="Node3D"]
+
+[node name="Scooter" type="CharacterBody3D" parent="."]
+position = Vector3(0, 1, 0)
+script = ExtResource("1_scooter")
+JumpHeightUpgrade = ExtResource("11_upgrade_jump")
+MaxSpeedUpgrade = ExtResource("12_upgrade_speed")
+
+[node name="Visual" type="Node3D" parent="Scooter"]
+
+[node name="Deck" type="MeshInstance3D" parent="Scooter/Visual"]
+position = Vector3(0, -0.7, 0)
+mesh = SubResource("BoxMesh_deck")
+
+[node name="WheelFront" type="MeshInstance3D" parent="Scooter/Visual"]
+position = Vector3(0, -0.78, -0.32)
+rotation_degrees = Vector3(0, 0, 90)
+mesh = SubResource("CylinderMesh_wheel")
+
+[node name="WheelBack" type="MeshInstance3D" parent="Scooter/Visual"]
+position = Vector3(0, -0.78, 0.32)
+rotation_degrees = Vector3(0, 0, 90)
+mesh = SubResource("CylinderMesh_wheel")
+
+[node name="HandlebarPost" type="MeshInstance3D" parent="Scooter/Visual"]
+position = Vector3(0, -0.25, -0.34)
+mesh = SubResource("BoxMesh_post")
+
+[node name="HandlebarBar" type="MeshInstance3D" parent="Scooter/Visual"]
+position = Vector3(0, 0.2, -0.34)
+mesh = SubResource("BoxMesh_bar")
+
+[node name="RiderTorso" type="MeshInstance3D" parent="Scooter/Visual"]
+position = Vector3(0, 0.25, 0.05)
+mesh = SubResource("CapsuleMesh_rider")
+
+[node name="RiderHead" type="MeshInstance3D" parent="Scooter/Visual"]
+position = Vector3(0, 0.85, 0.05)
+mesh = SubResource("SphereMesh_head")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Scooter"]
+shape = SubResource("CapsuleShape3D_scooter")
+
+[node name="LandingDust" type="GPUParticles3D" parent="Scooter"]
+position = Vector3(0, -0.78, 0)
+emitting = false
+amount = 16
+lifetime = 0.5
+one_shot = true
+explosiveness = 0.9
+process_material = SubResource("ParticleMat_dust")
+draw_pass_1 = SubResource("SphereMesh_dust")
+
+[node name="TrickController" type="Node" parent="Scooter"]
+script = ExtResource("3_trick")
+ScooterPath = NodePath("..")
+VisualMeshPath = NodePath("../Visual")
+LandingToleranceUpgrade = ExtResource("13_upgrade_landing")
+LandingParticlesPath = NodePath("../LandingDust")
+
+[node name="CameraRig" type="Node3D" parent="."]
+position = Vector3(0, 2, 0)
+script = ExtResource("2_camrig")
+TargetPath = NodePath("../Scooter")
+
+[node name="SpringArm3D" type="SpringArm3D" parent="CameraRig"]
+rotation_degrees = Vector3(-20, 0, 0)
+spring_length = 6.0
+
+[node name="Camera3D" type="Camera3D" parent="CameraRig/SpringArm3D"]
+current = true
+
+[node name="Hud" parent="." instance=ExtResource("4_hud")]
+
+[node name="MissionManager" type="Node" parent="."]
+script = ExtResource("5_missionmgr")
+Missions = Array[ExtResource("10_missiondef")]([ExtResource("7_mission_score"), ExtResource("8_mission_tricks"), ExtResource("9_mission_combo")])
+
+[node name="MissionPanel" parent="." instance=ExtResource("6_missionpanel")]
+MissionManagerPath = NodePath("../MissionManager")
+
+[node name="UpgradeShop" parent="." instance=ExtResource("15_upgradeshop")]
+Upgrades = Array[ExtResource("14_upgradedef")]([ExtResource("11_upgrade_jump"), ExtResource("12_upgrade_speed"), ExtResource("13_upgrade_landing")])

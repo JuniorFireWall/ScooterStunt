@@ -1,20 +1,7 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=8 format=3]
 
-[ext_resource type="Script" path="res://scripts/Player/ScooterController.cs" id="1_scooter"]
-[ext_resource type="Script" path="res://scripts/Player/CameraRig.cs" id="2_camrig"]
-[ext_resource type="Script" path="res://scripts/Tricks/TrickController.cs" id="3_trick"]
-[ext_resource type="PackedScene" path="res://scenes/UI/Hud.tscn" id="4_hud"]
-[ext_resource type="Script" path="res://scripts/Missions/MissionManager.cs" id="5_missionmgr"]
-[ext_resource type="PackedScene" path="res://scenes/UI/MissionPanel.tscn" id="6_missionpanel"]
-[ext_resource type="Resource" path="res://data/missions/mission_score.tres" id="7_mission_score"]
-[ext_resource type="Resource" path="res://data/missions/mission_tricks.tres" id="8_mission_tricks"]
-[ext_resource type="Resource" path="res://data/missions/mission_combo.tres" id="9_mission_combo"]
-[ext_resource type="Script" path="res://scripts/Missions/MissionDefinition.cs" id="10_missiondef"]
-[ext_resource type="Resource" path="res://data/upgrades/upgrade_jump_height.tres" id="11_upgrade_jump"]
-[ext_resource type="Resource" path="res://data/upgrades/upgrade_max_speed.tres" id="12_upgrade_speed"]
-[ext_resource type="Resource" path="res://data/upgrades/upgrade_landing_tolerance.tres" id="13_upgrade_landing"]
-[ext_resource type="Script" path="res://scripts/Progression/UpgradeDefinition.cs" id="14_upgradedef"]
-[ext_resource type="PackedScene" path="res://scenes/UI/UpgradeShop.tscn" id="15_upgradeshop"]
+[ext_resource type="PackedScene" path="res://scenes/PlayerRig.tscn" id="1_playerrig"]
+[ext_resource type="Script" path="res://scripts/World/MapSwitcher.cs" id="2_mapswitcher"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat_1"]
 sky_top_color = Color(0.3, 0.55, 0.85, 1)
@@ -44,18 +31,9 @@ size = Vector3(6, 0.5, 8)
 [sub_resource type="BoxShape3D" id="BoxShape3D_ramp"]
 size = Vector3(6, 0.5, 8)
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_scooter"]
-radius = 0.4
-height = 1.6
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_scooter"]
-radius = 0.4
-height = 1.6
-
-[sub_resource type="BoxMesh" id="BoxMesh_nose"]
-size = Vector3(0.25, 0.25, 0.5)
-
 [node name="TestTrack" type="Node3D"]
+script = ExtResource("2_mapswitcher")
+NextMapPath = "res://scenes/ParkTwo.tscn"
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
 rotation_degrees = Vector3(-50, -30, 0)
@@ -82,48 +60,4 @@ mesh = SubResource("BoxMesh_ramp")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ramp"]
 shape = SubResource("BoxShape3D_ramp")
 
-[node name="Scooter" type="CharacterBody3D" parent="."]
-position = Vector3(0, 1, 0)
-script = ExtResource("1_scooter")
-JumpHeightUpgrade = ExtResource("11_upgrade_jump")
-MaxSpeedUpgrade = ExtResource("12_upgrade_speed")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Scooter"]
-mesh = SubResource("CapsuleMesh_scooter")
-
-[node name="Nose" type="MeshInstance3D" parent="Scooter/MeshInstance3D"]
-position = Vector3(0, 0, -0.55)
-mesh = SubResource("BoxMesh_nose")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Scooter"]
-shape = SubResource("CapsuleShape3D_scooter")
-
-[node name="TrickController" type="Node" parent="Scooter"]
-script = ExtResource("3_trick")
-ScooterPath = NodePath("..")
-VisualMeshPath = NodePath("../MeshInstance3D")
-LandingToleranceUpgrade = ExtResource("13_upgrade_landing")
-
-[node name="CameraRig" type="Node3D" parent="."]
-position = Vector3(0, 2, 0)
-script = ExtResource("2_camrig")
-TargetPath = NodePath("../Scooter")
-
-[node name="SpringArm3D" type="SpringArm3D" parent="CameraRig"]
-rotation_degrees = Vector3(-20, 0, 0)
-spring_length = 6.0
-
-[node name="Camera3D" type="Camera3D" parent="CameraRig/SpringArm3D"]
-current = true
-
-[node name="Hud" parent="." instance=ExtResource("4_hud")]
-
-[node name="MissionManager" type="Node" parent="."]
-script = ExtResource("5_missionmgr")
-Missions = Array[ExtResource("10_missiondef")]([ExtResource("7_mission_score"), ExtResource("8_mission_tricks"), ExtResource("9_mission_combo")])
-
-[node name="MissionPanel" parent="." instance=ExtResource("6_missionpanel")]
-MissionManagerPath = NodePath("../MissionManager")
-
-[node name="UpgradeShop" parent="." instance=ExtResource("15_upgradeshop")]
-Upgrades = Array[ExtResource("14_upgradedef")]([ExtResource("11_upgrade_jump"), ExtResource("12_upgrade_speed"), ExtResource("13_upgrade_landing")])
+[node name="PlayerRig" parent="." instance=ExtResource("1_playerrig")]

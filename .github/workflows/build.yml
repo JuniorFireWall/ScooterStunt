@@ -21,6 +21,23 @@ jobs:
       - name: Build C# project
         run: dotnet build
 
+      - name: Install Android build template
+        run: |
+          set -e
+          wget -nv https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}-stable/Godot_v${{ env.GODOT_VERSION }}-stable_mono_linux_x86_64.zip -O /tmp/godot.zip
+          7z x /tmp/godot.zip -o/tmp/godot_bin -y
+          GODOT_BIN=$(find /tmp/godot_bin -name "Godot_v*.x86_64" | head -1)
+
+          TEMPLATES_DIR="$HOME/.local/share/godot/export_templates/${{ env.GODOT_VERSION }}.stable.mono"
+          mkdir -p "$TEMPLATES_DIR"
+          wget -nv https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}-stable/Godot_v${{ env.GODOT_VERSION }}-stable_mono_export_templates.tpz -O /tmp/templates.tpz
+          unzip -o -j /tmp/templates.tpz "templates/android_source.zip" "templates/android_debug.apk" "templates/android_release.apk" -d "$TEMPLATES_DIR"
+
+          # Needs to run combined with an export invocation - running it
+          # standalone silently does nothing.
+          "$GODOT_BIN" --headless --path . --install-android-build-template --export-debug Android /tmp/throwaway.apk || true
+          test -d android/build && echo "Android build template installed."
+
       - name: Export Android build
         id: export
         uses: firebelley/godot-export@v6.0.0

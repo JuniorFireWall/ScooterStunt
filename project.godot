@@ -14,6 +14,10 @@ config/name="ScooterStunt"
 run/main_scene="res://scenes/TestTrack.tscn"
 config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 
+[autoload]
+
+Score="*res://scripts/Tricks/ScoreManager.cs"
+
 [dotnet]
 
 project/assembly_name="ScooterStunt"

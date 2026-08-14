@@ -1,7 +1,9 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/Player/ScooterController.cs" id="1_scooter"]
 [ext_resource type="Script" path="res://scripts/Player/CameraRig.cs" id="2_camrig"]
+[ext_resource type="Script" path="res://scripts/Tricks/TrickController.cs" id="3_trick"]
+[ext_resource type="PackedScene" path="res://scenes/UI/Hud.tscn" id="4_hud"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat_1"]
 sky_top_color = Color(0.3, 0.55, 0.85, 1)
@@ -39,6 +41,9 @@ height = 1.6
 radius = 0.4
 height = 1.6
 
+[sub_resource type="BoxMesh" id="BoxMesh_nose"]
+size = Vector3(0.25, 0.25, 0.5)
+
 [node name="TestTrack" type="Node3D"]
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
@@ -73,8 +78,17 @@ script = ExtResource("1_scooter")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Scooter"]
 mesh = SubResource("CapsuleMesh_scooter")
 
+[node name="Nose" type="MeshInstance3D" parent="Scooter/MeshInstance3D"]
+position = Vector3(0, 0, -0.55)
+mesh = SubResource("BoxMesh_nose")
+
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Scooter"]
 shape = SubResource("CapsuleShape3D_scooter")
+
+[node name="TrickController" type="Node" parent="Scooter"]
+script = ExtResource("3_trick")
+ScooterPath = NodePath("..")
+VisualMeshPath = NodePath("../MeshInstance3D")
 
 [node name="CameraRig" type="Node3D" parent="."]
 position = Vector3(0, 2, 0)
@@ -87,3 +101,5 @@ spring_length = 6.0
 
 [node name="Camera3D" type="Camera3D" parent="CameraRig/SpringArm3D"]
 current = true
+
+[node name="Hud" parent="." instance=ExtResource("4_hud")]

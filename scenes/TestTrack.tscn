@@ -1,9 +1,15 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource type="Script" path="res://scripts/Player/ScooterController.cs" id="1_scooter"]
 [ext_resource type="Script" path="res://scripts/Player/CameraRig.cs" id="2_camrig"]
 [ext_resource type="Script" path="res://scripts/Tricks/TrickController.cs" id="3_trick"]
 [ext_resource type="PackedScene" path="res://scenes/UI/Hud.tscn" id="4_hud"]
+[ext_resource type="Script" path="res://scripts/Missions/MissionManager.cs" id="5_missionmgr"]
+[ext_resource type="PackedScene" path="res://scenes/UI/MissionPanel.tscn" id="6_missionpanel"]
+[ext_resource type="Resource" path="res://data/missions/mission_score.tres" id="7_mission_score"]
+[ext_resource type="Resource" path="res://data/missions/mission_tricks.tres" id="8_mission_tricks"]
+[ext_resource type="Resource" path="res://data/missions/mission_combo.tres" id="9_mission_combo"]
+[ext_resource type="Script" path="res://scripts/Missions/MissionDefinition.cs" id="10_missiondef"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat_1"]
 sky_top_color = Color(0.3, 0.55, 0.85, 1)
@@ -103,3 +109,10 @@ spring_length = 6.0
 current = true
 
 [node name="Hud" parent="." instance=ExtResource("4_hud")]
+
+[node name="MissionManager" type="Node" parent="."]
+script = ExtResource("5_missionmgr")
+Missions = Array[ExtResource("10_missiondef")]([ExtResource("7_mission_score"), ExtResource("8_mission_tricks"), ExtResource("9_mission_combo")])
+
+[node name="MissionPanel" parent="." instance=ExtResource("6_missionpanel")]
+MissionManagerPath = NodePath("../MissionManager")

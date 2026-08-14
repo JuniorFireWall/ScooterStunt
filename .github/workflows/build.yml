@@ -18,6 +18,9 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
+      - name: Build C# project
+        run: dotnet build
+
       - name: Export Android build
         id: export
         uses: firebelley/godot-export@v6.0.0
@@ -26,8 +29,8 @@ jobs:
           godot_export_templates_download_url: https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}-stable/Godot_v${{ env.GODOT_VERSION }}-stable_mono_export_templates.tpz
           relative_project_path: ./
           export_debug: true
-          archive_export_output: true
-          use_godot_4_export_flags: true
+          archive_output: true
+          presets_to_export: '["Android"]'
 
       - uses: actions/upload-artifact@v4
         with:
@@ -43,6 +46,9 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
+      - name: Build C# project
+        run: dotnet build
+
       - name: Export iOS Xcode project
         id: export
         uses: firebelley/godot-export@v6.0.0
@@ -51,8 +57,8 @@ jobs:
           godot_export_templates_download_url: https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}-stable/Godot_v${{ env.GODOT_VERSION }}-stable_mono_export_templates.tpz
           relative_project_path: ./
           export_debug: true
-          archive_export_output: false
-          use_godot_4_export_flags: true
+          archive_output: false
+          presets_to_export: '["iOS"]'
 
       # No Apple Developer account in CI, so this only proves the exported
       # Xcode project actually compiles - it does not produce a signed,
@@ -60,7 +66,11 @@ jobs:
       # (borrowed Mac / cloud Mac) with an Apple ID.
       - name: Compile-only check (no code signing)
         run: |
-          cd "${{ steps.export.outputs.export_path }}" 2>/dev/null || cd build/ios
-          xcodebuild -project *.xcodeproj -scheme "*" -sdk iphonesimulator \
-            CODE_SIGNING_ALLOWED=NO build || \
-          xcodebuild -list
+          set -e
+          PROJECT=$(find "$HOME/.local/share/godot/builds/iOS" -name "*.xcodeproj" | head -1)
+          echo "Found Xcode project: $PROJECT"
+          xcodebuild -project "$PROJECT" -list
+          SCHEME=$(xcodebuild -project "$PROJECT" -list | awk '/Schemes:/{getline; print; exit}' | xargs)
+          echo "Using scheme: $SCHEME"
+          xcodebuild -project "$PROJECT" -scheme "$SCHEME" -sdk iphonesimulator \
+            CODE_SIGNING_ALLOWED=NO build

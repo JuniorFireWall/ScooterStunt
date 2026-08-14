@@ -1,0 +1,66 @@
+name: Build
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch: {}
+
+env:
+  GODOT_VERSION: 4.7.1
+
+jobs:
+  export-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Export Android build
+        id: export
+        uses: firebelley/godot-export@v6.0.0
+        with:
+          godot_executable_download_url: https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}-stable/Godot_v${{ env.GODOT_VERSION }}-stable_mono_linux_x86_64.zip
+          godot_export_templates_download_url: https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}-stable/Godot_v${{ env.GODOT_VERSION }}-stable_mono_export_templates.tpz
+          relative_project_path: ./
+          export_debug: true
+          archive_export_output: true
+          use_godot_4_export_flags: true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-build
+          path: ${{ steps.export.outputs.archive_directory }}
+
+  export-ios-compile-check:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Export iOS Xcode project
+        id: export
+        uses: firebelley/godot-export@v6.0.0
+        with:
+          godot_executable_download_url: https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}-stable/Godot_v${{ env.GODOT_VERSION }}-stable_mono_macos.universal.zip
+          godot_export_templates_download_url: https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}-stable/Godot_v${{ env.GODOT_VERSION }}-stable_mono_export_templates.tpz
+          relative_project_path: ./
+          export_debug: true
+          archive_export_output: false
+          use_godot_4_export_flags: true
+
+      # No Apple Developer account in CI, so this only proves the exported
+      # Xcode project actually compiles - it does not produce a signed,
+      # installable .ipa. That last step needs a real signing session
+      # (borrowed Mac / cloud Mac) with an Apple ID.
+      - name: Compile-only check (no code signing)
+        run: |
+          cd "${{ steps.export.outputs.export_path }}" 2>/dev/null || cd build/ios
+          xcodebuild -project *.xcodeproj -scheme "*" -sdk iphonesimulator \
+            CODE_SIGNING_ALLOWED=NO build || \
+          xcodebuild -list

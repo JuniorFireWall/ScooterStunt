@@ -30,7 +30,7 @@ jobs:
           relative_project_path: ./
           export_debug: true
           archive_output: true
-          presets_to_export: '["Android"]'
+          presets_to_export: Android
 
       - uses: actions/upload-artifact@v4
         with:
@@ -58,7 +58,7 @@ jobs:
           relative_project_path: ./
           export_debug: true
           archive_output: false
-          presets_to_export: '["iOS"]'
+          presets_to_export: iOS
 
       # No Apple Developer account in CI, so this only proves the exported
       # Xcode project actually compiles - it does not produce a signed,

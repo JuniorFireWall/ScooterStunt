@@ -1,4 +1,5 @@
 using Godot;
+using ScooterStunt.Progression;
 using ScooterStunt.Tricks;
 
 namespace ScooterStunt.Missions;
@@ -14,11 +15,25 @@ public partial class MissionManager : Node
 	private bool[] _completed;
 	private int _tricksLandedCount;
 	private ScoreManager _scoreManager;
+	private PlayerProgression _progression;
 
 	public override void _Ready()
 	{
 		_progress = new int[Missions.Count];
 		_completed = new bool[Missions.Count];
+		_progression = GetNode<PlayerProgression>("/root/Progression");
+
+		for (var i = 0; i < Missions.Count; i++)
+		{
+			if (_progression.IsMissionCompleted(Missions[i].MissionName))
+			{
+				_completed[i] = true;
+				_progress[i] = Missions[i].TargetValue;
+				// Deferred so UI nodes (e.g. MissionPanel) finish their own _Ready
+				// and connect to this signal before it fires.
+				CallDeferred(MethodName.EmitAlreadyCompleted, i);
+			}
+		}
 
 		_scoreManager = GetNode<ScoreManager>("/root/Score");
 		_scoreManager.ScoreChanged += OnScoreChanged;
@@ -73,7 +88,15 @@ public partial class MissionManager : Node
 		if (value >= Missions[index].TargetValue)
 		{
 			_completed[index] = true;
-			EmitSignal(SignalName.MissionCompleted, index, Missions[index].MissionName, Missions[index].RewardXp);
+			var mission = Missions[index];
+			_progression.AddXp(mission.RewardXp);
+			_progression.MarkMissionCompleted(mission.MissionName);
+			EmitSignal(SignalName.MissionCompleted, index, mission.MissionName, mission.RewardXp);
 		}
+	}
+
+	private void EmitAlreadyCompleted(int index)
+	{
+		EmitSignal(SignalName.MissionCompleted, index, Missions[index].MissionName, 0);
 	}
 }

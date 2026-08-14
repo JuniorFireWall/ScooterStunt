@@ -1,0 +1,13 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/Progression/UpgradeDefinition.cs" id="1_upgradedef"]
+
+[resource]
+script = ExtResource("1_upgradedef")
+UpgradeId = "jump_height"
+DisplayName = "Sprunghöhe"
+DescriptionText = "Springe höher"
+Stat = 0
+MaxLevel = 3
+CostPerLevel = 1
+ValuePerLevel = 1.5

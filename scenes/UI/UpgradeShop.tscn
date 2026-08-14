@@ -1,0 +1,24 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/UI/UpgradeShop.cs" id="1_shop"]
+
+[node name="UpgradeShop" type="CanvasLayer"]
+script = ExtResource("1_shop")
+
+[node name="Panel" type="PanelContainer" parent="."]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -170.0
+offset_right = 380.0
+offset_bottom = -20.0
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+
+[node name="PointsLabel" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+text = "Level 1 - Upgrade-Punkte: 0"
+
+[node name="UpgradeList" type="VBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
